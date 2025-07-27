@@ -1,18 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using StudentInfoSys.Data.Context;
+using StudentInfoSys.Data.Repositories;
+using StudentInfoSys.Data.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Database Connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<StudentInfoSysDbContext>(options => options.UseSqlServer(connectionString));
+
+// Repository & UnitOfWork DI
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
