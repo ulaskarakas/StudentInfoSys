@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentInfoSys.Data.Context;
 
@@ -11,9 +12,11 @@ using StudentInfoSys.Data.Context;
 namespace StudentInfoSys.Data.Migrations
 {
     [DbContext(typeof(StudentInfoSysDbContext))]
-    partial class StudentInfoSysDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728080706_AddBaseEntityFiledsToUserRole")]
+    partial class AddBaseEntityFiledsToUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

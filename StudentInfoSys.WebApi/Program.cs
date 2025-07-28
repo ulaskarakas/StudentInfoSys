@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Data.Context;
 using StudentInfoSys.Data.Repositories;
 using StudentInfoSys.Data.UnitOfWork;
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<StudentInfoSysDbContext>(options => options.UseSql
 // Repository & UnitOfWork DI
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserService, UserManager>();
 
 var app = builder.Build();
 
