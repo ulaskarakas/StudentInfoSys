@@ -38,5 +38,25 @@ namespace StudentInfoSys.WebApi.Controllers
             else
                 return BadRequest(result.Message);
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid request.");
+
+            var userLoginDto = new UserLoginDto
+            {
+                Email = request.Email,
+                Password = request.Password
+            };
+
+            var result = await _userService.LoginAsync(userLoginDto);
+
+            if (result.IsSucceed)
+                return Ok();
+            else
+                return BadRequest(result.Message);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using PatikaLMSCoreProject.Business.Types;
+﻿using StudentInfoSys.Business.Types;
 using StudentInfoSys.Business.Operations.Role.Dtos;
 using StudentInfoSys.Data.Entities;
 using StudentInfoSys.Data.Repositories;

@@ -1,4 +1,4 @@
-﻿using PatikaLMSCoreProject.Business.Types;
+﻿using StudentInfoSys.Business.Types;
 using StudentInfoSys.Business.DataProtection;
 using StudentInfoSys.Business.Operations.User.Dtos;
 using StudentInfoSys.Data.Entities;
@@ -88,6 +88,54 @@ namespace StudentInfoSys.Business.Operations.User
                 {
                     IsSucceed = false,
                     Message = $"An error occurred during user registration: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ServiceMessage<UserInfoDto>> LoginAsync(UserLoginDto userLoginDto)
+        {
+            try
+            {
+                var user = await _userRepository.GetSingleAsync(u => u.Email == userLoginDto.Email && !u.IsDeleted);
+
+                if (user == null)
+                {
+                    return new ServiceMessage<UserInfoDto>
+                    {
+                        IsSucceed = false,
+                        Message = "Invalid email or password."
+                    };
+                }
+
+                var decryptedPassword = _dataProtection.Unprotect(user.Password);
+
+                if (decryptedPassword != userLoginDto.Password)
+                {
+                    return new ServiceMessage<UserInfoDto>
+                    {
+                        IsSucceed = false,
+                        Message = "Invalid email or password."
+                    };
+                }
+
+                return new ServiceMessage<UserInfoDto>
+                {
+                    IsSucceed = true,
+                    Data = new UserInfoDto
+                    {
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        BirthDate = user.BirthDate
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceMessage<UserInfoDto>
+                {
+                    IsSucceed = false,
+                    Message = $"An error occurred during login: {ex.Message}"
                 };
             }
         }
