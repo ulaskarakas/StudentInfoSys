@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using StudentInfoSys.Business.DataProtection;
 using StudentInfoSys.Business.Operations.Role;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Data.Context;
@@ -16,11 +18,18 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<StudentInfoSysDbContext>(options => options.UseSqlServer(connectionString));
 
-// Repository & UnitOfWork DI
+// Service Registrations
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<IRoleService, RoleManager>();
+
+// Data Protection
+builder.Services.AddScoped<IDataProtection, DataProtection>();
+var keysDirectory = new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "App_Data", "Keys"));
+builder.Services.AddDataProtection()
+                .SetApplicationName("StudentInfoSys")
+                .PersistKeysToFileSystem(keysDirectory);
 
 var app = builder.Build();
 

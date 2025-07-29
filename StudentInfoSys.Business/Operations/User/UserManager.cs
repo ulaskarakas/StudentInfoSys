@@ -1,4 +1,5 @@
 ﻿using PatikaLMSCoreProject.Business.Types;
+using StudentInfoSys.Business.DataProtection;
 using StudentInfoSys.Business.Operations.User.Dtos;
 using StudentInfoSys.Data.Entities;
 using StudentInfoSys.Data.Repositories;
@@ -12,13 +13,15 @@ namespace StudentInfoSys.Business.Operations.User
         private readonly IRepository<RoleEntity> _roleRepository;
         private readonly IRepository<UserRoleEntity> _userRoleRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDataProtection _dataProtection;
 
-        public UserManager(IRepository<UserEntity> userRepository, IRepository<RoleEntity> roleRepository, IRepository<UserRoleEntity> userRoleRepository, IUnitOfWork unitOfWork)
+        public UserManager(IRepository<UserEntity> userRepository, IRepository<RoleEntity> roleRepository, IRepository<UserRoleEntity> userRoleRepository, IUnitOfWork unitOfWork, IDataProtection dataProtection)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _userRoleRepository = userRoleRepository;
             _unitOfWork = unitOfWork;
+            _dataProtection = dataProtection;
         }
 
         public async Task<ServiceMessage> RegisterAsync(UserRegisterDto userRegisterDto)
@@ -42,7 +45,7 @@ namespace StudentInfoSys.Business.Operations.User
                     FirstName = userRegisterDto.FirstName,
                     LastName = userRegisterDto.LastName,
                     Email = userRegisterDto.Email,
-                    Password = userRegisterDto.Password, // TODO: Hash the password before saving
+                    Password = _dataProtection.Protect(userRegisterDto.Password),
                     BirthDate = userRegisterDto.BirthDate,
                     CreatedDate = DateTime.UtcNow,
                     IsDeleted = false
