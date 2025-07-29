@@ -8,6 +8,7 @@ namespace StudentInfoSys.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
         {
+            builder.Ignore(ur => ur.Id);
             builder.HasKey(ur => new { ur.UserId, ur.RoleId });
 
             builder.HasOne(ur => ur.User)

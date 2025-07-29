@@ -12,8 +12,8 @@ using StudentInfoSys.Data.Context;
 namespace StudentInfoSys.Data.Migrations
 {
     [DbContext(typeof(StudentInfoSysDbContext))]
-    [Migration("20250728080706_AddBaseEntityFiledsToUserRole")]
-    partial class AddBaseEntityFiledsToUserRole
+    [Migration("20250729115401_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -279,9 +279,6 @@ namespace StudentInfoSys.Data.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
