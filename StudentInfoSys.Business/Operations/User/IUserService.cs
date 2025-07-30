@@ -7,5 +7,6 @@ namespace StudentInfoSys.Business.Operations.User
     {
         Task<ServiceMessage> RegisterAsync(UserRegisterDto userRegisterDto);
         Task<ServiceMessage<UserInfoDto>> LoginAsync(UserLoginDto userLoginDto);
+        Task<ServiceMessage<UserInfoDto>> GetUserByIdAsync(int id);
     }
 }

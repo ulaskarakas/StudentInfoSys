@@ -139,5 +139,44 @@ namespace StudentInfoSys.Business.Operations.User
                 };
             }
         }
+
+        public async Task<ServiceMessage<UserInfoDto>> GetUserByIdAsync(int id)
+        {
+            try
+            {
+                var user = await _userRepository.GetSingleAsync(u => u.Id == id && !u.IsDeleted);
+                if (user == null)
+                {
+                    return new ServiceMessage<UserInfoDto>
+                    {
+                        IsSucceed = false,
+                        Message = "User not found."
+                    };
+                }
+
+                var userDto = new UserInfoDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    BirthDate = user.BirthDate
+                };
+
+                return new ServiceMessage<UserInfoDto>
+                {
+                    IsSucceed = true,
+                    Data = userDto
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceMessage<UserInfoDto>
+                {
+                    IsSucceed = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
     }
 }
