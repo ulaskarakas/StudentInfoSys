@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Business.Operations.User.Dtos;
+using StudentInfoSys.WebApi.Jwt;
 using StudentInfoSys.WebApi.Models.User;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -53,10 +55,40 @@ namespace StudentInfoSys.WebApi.Controllers
 
             var result = await _userService.LoginAsync(userLoginDto);
 
-            if (result.IsSucceed)
-                return Ok();
-            else
+            if (!result.IsSucceed)
+            {
                 return BadRequest(result.Message);
+            }
+
+            var user = result.Data;
+
+            var configuration = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+
+            var token = JwtHelper.GenerateJwtToken(new JwtDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                BirthDate = user.BirthDate,
+                SecretKey = configuration["Jwt:SecretKey"]!,
+                Issuer = configuration["Jwt:Issuer"]!,
+                Audience = configuration["Jwt:Audience"]!,
+                ExpireMinutes = int.Parse(configuration["Jwt:ExpireMinutes"]!)
+            });
+
+            return Ok(new UserLoginResponse
+            {
+                Message = "Login completed successfully",
+                Token = token
+            });
+        }
+
+        [HttpGet("me")]
+        [Authorize] // If there is no token, there is no response
+        public IActionResult GetMyUser()
+        {
+            return Ok();
         }
     }
 }
