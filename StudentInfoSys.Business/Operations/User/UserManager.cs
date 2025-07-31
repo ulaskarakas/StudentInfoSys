@@ -355,5 +355,46 @@ namespace StudentInfoSys.Business.Operations.User
                 return new ServiceMessage { IsSucceed = false, Message = ex.Message };
             }
         }
+
+        // Remove a role
+        public async Task<ServiceMessage> RemoveRoleAsync(string email, string roleName)
+        {
+            await _unitOfWork.BeginTransaction();
+            try
+            {
+                var user = await _userRepository.GetSingleAsync(u => u.Email == email && !u.IsDeleted);
+                if (user == null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "User not found." };
+                }
+
+                var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
+                if (role == null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "Role not found." };
+                }
+
+                var userRole = await _userRoleRepository.GetSingleAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id && !ur.IsDeleted);
+                if (userRole == null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "User does not have this role." };
+                }
+
+                userRole.IsDeleted = true;
+                _userRoleRepository.Update(userRole);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransaction();
+
+                return new ServiceMessage { IsSucceed = true, Message = "Role removed from user." };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransaction();
+                return new ServiceMessage { IsSucceed = false, Message = ex.Message };
+            }
+        }
     }
 }

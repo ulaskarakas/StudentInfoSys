@@ -11,5 +11,6 @@ namespace StudentInfoSys.Business.Operations.User
         Task<ServiceMessage> UpdateByIdAsync(UserUpdateDto userUpdateDto);
         Task<ServiceMessage> DeleteByIdAsync(int id);
         Task<ServiceMessage> AssignRoleAsync(string email, string roleName);
+        Task<ServiceMessage> RemoveRoleAsync(string email, string roleName);
     }
 }

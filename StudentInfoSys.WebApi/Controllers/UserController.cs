@@ -72,5 +72,15 @@ namespace StudentInfoSys.WebApi.Controllers
                 return Ok(result.Message);
             return BadRequest(result.Message);
         }
+
+        [HttpPost("role/remove")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveRole(UserRoleRemoveRequestDto request)
+        {
+            var result = await _userService.RemoveRoleAsync(request.Email, request.RoleName);
+            if (result.IsSucceed)
+                return Ok(result.Message);
+            return BadRequest(result.Message);
+        }
     }
 }
