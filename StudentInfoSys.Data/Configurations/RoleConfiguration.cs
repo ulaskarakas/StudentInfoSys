@@ -15,6 +15,14 @@ namespace StudentInfoSys.Data.Configurations
             builder.HasMany(r => r.UserRoles)
                    .WithOne(ur => ur.Role)
                    .HasForeignKey(ur => ur.RoleId);
+
+            builder.HasData(new RoleEntity
+            {
+                Id = 1,
+                Name = "User",
+                CreatedDate = DateTime.UtcNow,
+                IsDeleted = false
+            });
         }
     }
 }

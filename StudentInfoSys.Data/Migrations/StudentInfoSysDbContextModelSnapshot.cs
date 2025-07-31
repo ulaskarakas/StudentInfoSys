@@ -155,6 +155,15 @@ namespace StudentInfoSys.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedDate = new DateTime(2025, 7, 31, 9, 8, 58, 92, DateTimeKind.Utc).AddTicks(6664),
+                            IsDeleted = false,
+                            Name = "User"
+                        });
                 });
 
             modelBuilder.Entity("StudentInfoSys.Data.Entities.StudentEntity", b =>

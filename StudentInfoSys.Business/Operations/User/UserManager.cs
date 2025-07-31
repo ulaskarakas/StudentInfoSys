@@ -260,6 +260,14 @@ namespace StudentInfoSys.Business.Operations.User
 
                 user.IsDeleted = true;
                 _userRepository.Update(user);
+
+                var userRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == id && !ur.IsDeleted);
+                foreach (var userRole in userRoles)
+                {
+                    userRole.IsDeleted = true;
+                    _userRoleRepository.Update(userRole);
+                }
+
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransaction();
 

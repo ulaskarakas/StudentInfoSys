@@ -5,6 +5,6 @@ namespace StudentInfoSys.WebApi.Models.Role
     public class RoleCreateRequest
     {
         [Required]
-        public required string Name { get; set; }
+        public string Name { get; set; }
     }
 }

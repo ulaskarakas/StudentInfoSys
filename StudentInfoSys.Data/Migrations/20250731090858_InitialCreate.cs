@@ -198,6 +198,11 @@ namespace StudentInfoSys.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "CreatedDate", "IsDeleted", "ModifiedDate", "Name" },
+                values: new object[] { 1, new DateTime(2025, 7, 31, 9, 8, 58, 92, DateTimeKind.Utc).AddTicks(6664), false, null, "User" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_TeacherId",
                 table: "Courses",

@@ -55,7 +55,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
             var result = await _userService.LoginAsync(userLoginDto);
 
-            if (!result.IsSucceed)
+            if (!result.IsSucceed || result.Data == null)
             {
                 return BadRequest(result.Message);
             }

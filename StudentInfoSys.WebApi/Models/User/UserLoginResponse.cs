@@ -2,7 +2,7 @@
 {
     public class UserLoginResponse
     {
-        public string Message { get; set; }
-        public string Token { get; set; }
+        public required string Message { get; set; }
+        public required string Token { get; set; }
     }
 }
