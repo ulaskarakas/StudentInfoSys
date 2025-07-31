@@ -24,6 +24,7 @@ namespace StudentInfoSys.Business.Operations.User
             _dataProtection = dataProtection;
         }
 
+        // Register
         public async Task<ServiceMessage> RegisterAsync(UserRegisterDto userRegisterDto)
         {
             await _unitOfWork.BeginTransaction();
@@ -92,6 +93,7 @@ namespace StudentInfoSys.Business.Operations.User
             }
         }
 
+        // Login
         public async Task<ServiceMessage<UserInfoDto>> LoginAsync(UserLoginDto userLoginDto)
         {
             try
@@ -140,7 +142,8 @@ namespace StudentInfoSys.Business.Operations.User
             }
         }
 
-        public async Task<ServiceMessage<UserInfoDto>> GetUserByIdAsync(int id)
+        // Get an user
+        public async Task<ServiceMessage<UserInfoDto>> GetByIdAsync(int id)
         {
             try
             {
@@ -175,6 +178,104 @@ namespace StudentInfoSys.Business.Operations.User
                 {
                     IsSucceed = false,
                     Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
+
+        // Update an user
+        public async Task<ServiceMessage> UpdateByIdAsync(UserUpdateDto userUpdateDto)
+        {
+            await _unitOfWork.BeginTransaction();
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userUpdateDto.Id);
+                if (user == null || user.IsDeleted)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage
+                    {
+                        IsSucceed = false,
+                        Message = "User not found."
+                    };
+                }
+
+                var emailExists = await _userRepository.GetSingleAsync(u => u.Email == userUpdateDto.Email && u.Id != userUpdateDto.Id && !u.IsDeleted);
+                if (emailExists != null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage
+                    {
+                        IsSucceed = false,
+                        Message = "Another user with this email already exists."
+                    };
+                }
+
+                user.FirstName = userUpdateDto.FirstName;
+                user.LastName = userUpdateDto.LastName;
+                user.Email = userUpdateDto.Email;
+                user.BirthDate = userUpdateDto.BirthDate;
+
+                if (!string.IsNullOrWhiteSpace(userUpdateDto.Password))
+                {
+                    user.Password = _dataProtection.Protect(userUpdateDto.Password);
+                }
+
+                _userRepository.Update(user);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransaction();
+
+                return new ServiceMessage
+                {
+                    IsSucceed = true,
+                    Message = "User updated successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransaction();
+                return new ServiceMessage
+                {
+                    IsSucceed = false,
+                    Message = $"An error occurred while updating the user: {ex.Message}"
+                };
+            }
+        }
+
+        // Delete an user
+        public async Task<ServiceMessage> DeleteByIdAsync(int id)
+        {
+            await _unitOfWork.BeginTransaction();
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(id);
+                if (user == null || user.IsDeleted)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage
+                    {
+                        IsSucceed = false,
+                        Message = "User not found."
+                    };
+                }
+
+                user.IsDeleted = true;
+                _userRepository.Update(user);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransaction();
+
+                return new ServiceMessage
+                {
+                    IsSucceed = true,
+                    Message = "User deleted successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransaction();
+                return new ServiceMessage
+                {
+                    IsSucceed = false,
+                    Message = $"An error occurred while deleting the user: {ex.Message}"
                 };
             }
         }
