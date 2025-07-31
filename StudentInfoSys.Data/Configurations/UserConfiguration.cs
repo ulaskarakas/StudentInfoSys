@@ -32,6 +32,18 @@ namespace StudentInfoSys.Data.Configurations
             builder.HasMany(u => u.UserRoles)
                    .WithOne(ur => ur.User)
                    .HasForeignKey(ur => ur.UserId);
+
+            builder.HasData(new UserEntity
+            {
+                Id = 1,
+                FirstName = "Admin",
+                LastName = "Admin",
+                Email = "admin@example.com",
+                Password = "CfDJ8GT_2RvrfSxAkbeT_Rm5aL-mawQxIPdC_Em5WmeM8nrqcZYN9EcTl_ceTpFSioYgjUAm43ZZy_LhiP1MflUTahIaKn9Rn-pjb3S9K5VtPdS42a_m19BqLyEiJ-gQNgBf_w",
+                BirthDate = new DateTime(1990, 1, 1),
+                IsDeleted = false,
+                CreatedDate = DateTime.UtcNow
+            });
         }
     }
 }

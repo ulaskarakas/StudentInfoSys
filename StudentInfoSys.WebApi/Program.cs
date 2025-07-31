@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StudentInfoSys.Business.DataProtection;
-using StudentInfoSys.Business.Operations.Role;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Data.Context;
 using StudentInfoSys.Data.Repositories;
@@ -52,7 +51,6 @@ builder.Services.AddDbContext<StudentInfoSysDbContext>(options => options.UseSql
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserManager>();
-builder.Services.AddScoped<IRoleService, RoleManager>();
 
 // Data Protection
 builder.Services.AddScoped<IDataProtection, DataProtection>();

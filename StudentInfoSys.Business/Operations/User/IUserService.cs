@@ -1,5 +1,5 @@
-﻿using StudentInfoSys.Business.Types;
-using StudentInfoSys.Business.Operations.User.Dtos;
+﻿using StudentInfoSys.Business.Operations.User.Dtos;
+using StudentInfoSys.Business.Types;
 
 namespace StudentInfoSys.Business.Operations.User
 {
@@ -10,5 +10,6 @@ namespace StudentInfoSys.Business.Operations.User
         Task<ServiceMessage<UserInfoDto>> GetByIdAsync(int id);
         Task<ServiceMessage> UpdateByIdAsync(UserUpdateDto userUpdateDto);
         Task<ServiceMessage> DeleteByIdAsync(int id);
+        Task<ServiceMessage> AssignRoleAsync(string email, string roleName);
     }
 }

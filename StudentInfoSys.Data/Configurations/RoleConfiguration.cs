@@ -19,6 +19,27 @@ namespace StudentInfoSys.Data.Configurations
             builder.HasData(new RoleEntity
             {
                 Id = 1,
+                Name = "Admin",
+                CreatedDate = DateTime.UtcNow,
+                IsDeleted = false
+            });
+            builder.HasData(new RoleEntity
+            {
+                Id = 2,
+                Name = "Teacher",
+                CreatedDate = DateTime.UtcNow,
+                IsDeleted = false
+            });
+            builder.HasData(new RoleEntity
+            {
+                Id = 3,
+                Name = "Student",
+                CreatedDate = DateTime.UtcNow,
+                IsDeleted = false
+            });
+            builder.HasData(new RoleEntity
+            {
+                Id = 4,
                 Name = "User",
                 CreatedDate = DateTime.UtcNow,
                 IsDeleted = false

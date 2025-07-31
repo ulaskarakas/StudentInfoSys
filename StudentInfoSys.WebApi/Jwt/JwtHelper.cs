@@ -13,7 +13,7 @@ namespace StudentInfoSys.WebApi.Jwt
 
             var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtClaimNames.Id, jwtInfo.Id.ToString()),
                 new Claim(JwtClaimNames.Email, jwtInfo.Email),
@@ -21,6 +21,11 @@ namespace StudentInfoSys.WebApi.Jwt
                 new Claim(JwtClaimNames.LastName, jwtInfo.LastName),
                 new Claim(JwtClaimNames.BirthDate, jwtInfo.BirthDate.ToString("yyyy-MM-dd")),
             };
+
+            foreach (var role in jwtInfo.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var ExpireTime = DateTime.UtcNow.AddMinutes(jwtInfo.ExpireMinutes);
 

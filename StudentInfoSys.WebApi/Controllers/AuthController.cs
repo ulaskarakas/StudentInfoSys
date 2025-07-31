@@ -71,6 +71,7 @@ namespace StudentInfoSys.WebApi.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 BirthDate = user.BirthDate,
+                Roles = user.Roles,
                 SecretKey = configuration["Jwt:SecretKey"]!,
                 Issuer = configuration["Jwt:Issuer"]!,
                 Audience = configuration["Jwt:Audience"]!,

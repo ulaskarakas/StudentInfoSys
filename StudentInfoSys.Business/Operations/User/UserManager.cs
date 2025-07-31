@@ -120,6 +120,15 @@ namespace StudentInfoSys.Business.Operations.User
                     };
                 }
 
+                var userRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == user.Id && !ur.IsDeleted);
+                var roleNames = new List<string>();
+                foreach (var userRole in userRoles)
+                {
+                    var role = await _roleRepository.GetByIdAsync(userRole.RoleId);
+                    if (role != null && !role.IsDeleted)
+                        roleNames.Add(role.Name);
+                }
+
                 return new ServiceMessage<UserInfoDto>
                 {
                     IsSucceed = true,
@@ -128,7 +137,8 @@ namespace StudentInfoSys.Business.Operations.User
                         Email = user.Email,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        BirthDate = user.BirthDate
+                        BirthDate = user.BirthDate,
+                        Roles = roleNames
                     }
                 };
             }
@@ -157,13 +167,23 @@ namespace StudentInfoSys.Business.Operations.User
                     };
                 }
 
+                var userRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == user.Id && !ur.IsDeleted);
+                var roleNames = new List<string>();
+                foreach (var userRole in userRoles)
+                {
+                    var role = await _roleRepository.GetByIdAsync(userRole.RoleId);
+                    if (role != null && !role.IsDeleted)
+                        roleNames.Add(role.Name);
+                }
+
                 var userDto = new UserInfoDto
                 {
                     Id = user.Id,
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    BirthDate = user.BirthDate
+                    BirthDate = user.BirthDate,
+                    Roles = roleNames
                 };
 
                 return new ServiceMessage<UserInfoDto>
@@ -285,6 +305,54 @@ namespace StudentInfoSys.Business.Operations.User
                     IsSucceed = false,
                     Message = $"An error occurred while deleting the user: {ex.Message}"
                 };
+            }
+        }
+
+        // Assign a role
+        public async Task<ServiceMessage> AssignRoleAsync(string email, string roleName)
+        {
+            await _unitOfWork.BeginTransaction();
+            try
+            {
+                var user = await _userRepository.GetSingleAsync(u => u.Email == email && !u.IsDeleted);
+                if (user == null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "User not found." };
+                }
+
+                var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
+                if (role == null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "Role not found." };
+                }
+
+                // Kullanıcıda bu rol zaten var mı kontrol et
+                var hasRole = await _userRoleRepository.GetSingleAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id && !ur.IsDeleted);
+                if (hasRole != null)
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage { IsSucceed = false, Message = "User already has this role." };
+                }
+
+                var newUserRole = new UserRoleEntity
+                {
+                    UserId = user.Id,
+                    RoleId = role.Id,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = false
+                };
+                await _userRoleRepository.AddAsync(newUserRole);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransaction();
+
+                return new ServiceMessage { IsSucceed = true, Message = "Role assigned to user." };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransaction();
+                return new ServiceMessage { IsSucceed = false, Message = ex.Message };
             }
         }
     }

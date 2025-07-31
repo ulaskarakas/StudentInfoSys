@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Business.Operations.User.Dtos;
 using StudentInfoSys.WebApi.Models.User;
@@ -17,6 +18,7 @@ namespace StudentInfoSys.WebApi.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var result = await _userService.GetByIdAsync(id);
@@ -27,6 +29,7 @@ namespace StudentInfoSys.WebApi.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateRequest request)
         {
             var updateUserDto = new UserUpdateDto
@@ -50,6 +53,7 @@ namespace StudentInfoSys.WebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result = await _userService.DeleteByIdAsync(id);
@@ -57,6 +61,16 @@ namespace StudentInfoSys.WebApi.Controllers
                 return Ok(result.Message);
             else
                 return NotFound(result.Message);
+        }
+
+        [HttpPost("role/assign")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignRole(UserRoleAssignRequestDto request)
+        {
+            var result = await _userService.AssignRoleAsync(request.Email, request.RoleName);
+            if (result.IsSucceed)
+                return Ok(result.Message);
+            return BadRequest(result.Message);
         }
     }
 }
