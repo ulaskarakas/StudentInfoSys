@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.User;
-using StudentInfoSys.Business.Operations.User.Dtos;
 using StudentInfoSys.WebApi.Models.User;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -40,6 +39,7 @@ namespace StudentInfoSys.WebApi.Controllers
                 Password = request.Password,
                 Email = request.Email,
                 BirthDate = request.BirthDate,
+                RoleNames = request.RoleNames
             };
 
             if (id != updateUserDto.Id)
@@ -61,26 +61,6 @@ namespace StudentInfoSys.WebApi.Controllers
                 return Ok(result.Message);
             else
                 return NotFound(result.Message);
-        }
-
-        [HttpPost("role/assign")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignRole(UserRoleAssignRequestDto request)
-        {
-            var result = await _userService.AssignRoleAsync(request.Email, request.RoleName);
-            if (result.IsSucceed)
-                return Ok(result.Message);
-            return BadRequest(result.Message);
-        }
-
-        [HttpPost("role/remove")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveRole(UserRoleRemoveRequestDto request)
-        {
-            var result = await _userService.RemoveRoleAsync(request.Email, request.RoleName);
-            if (result.IsSucceed)
-                return Ok(result.Message);
-            return BadRequest(result.Message);
         }
     }
 }

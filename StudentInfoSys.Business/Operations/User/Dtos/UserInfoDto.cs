@@ -1,12 +1,18 @@
-﻿namespace StudentInfoSys.Business.Operations.User.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StudentInfoSys.Business.Operations.User.Dtos
 {
     public class UserInfoDto
     {
         public int Id { get; set; }
+        [Required]
         public required string Email { get; set; }
+        [Required]
         public required string FirstName { get; set; }
+        [Required]
         public required string LastName { get; set; }
+        [Required]
         public DateTime BirthDate { get; set; }
-        public List<string> Roles { get; set; } = new();
+        public required List<string> Roles { get; set; }
     }
 }

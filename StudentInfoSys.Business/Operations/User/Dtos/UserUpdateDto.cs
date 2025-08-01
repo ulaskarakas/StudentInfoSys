@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudentInfoSys.Business.Operations.User.Dtos
+public class UserUpdateDto
 {
-    public class UserUpdateDto
-    {
-        public int Id { get; set; }
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
-        public required string Password { get; set; }
-        public required string Email { get; set; }
-        public DateTime BirthDate { get; set; }
-    }
+    [Required]
+    public int Id { get; set; }
+    [Required]
+    public required string FirstName { get; set; }
+    [Required]
+    public required string LastName { get; set; }
+    [Required]
+    [EmailAddress]
+    public required string Email { get; set; }
+    public required string? Password { get; set; }
+    [Required]
+    public DateTime BirthDate { get; set; }
+    [Required]
+    [MinLength(1, ErrorMessage = "At least one role must be selected.")]
+    public required List<string> RoleNames { get; set; }
 }

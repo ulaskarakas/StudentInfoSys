@@ -15,5 +15,8 @@ namespace StudentInfoSys.WebApi.Models.User
         public required string LastName { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
+        [Required]
+        [MinLength(1, ErrorMessage = "At least one role must be selected.")]
+        public required List<string> RoleNames { get; set; }
     }
 }

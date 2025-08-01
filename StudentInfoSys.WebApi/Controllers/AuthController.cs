@@ -30,7 +30,8 @@ namespace StudentInfoSys.WebApi.Controllers
                 Password = request.Password,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                BirthDate = request.BirthDate
+                BirthDate = request.BirthDate,
+                RoleNames = request.RoleNames
             };
 
             var result = await _userService.RegisterAsync(UserRegisterDto);
@@ -86,7 +87,7 @@ namespace StudentInfoSys.WebApi.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize] // If there is no token, there is no response
+        [Authorize]
         public IActionResult GetMyUser()
         {
             return Ok();

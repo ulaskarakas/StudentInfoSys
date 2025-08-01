@@ -27,6 +27,15 @@ namespace StudentInfoSys.Business.Operations.User
         // Register
         public async Task<ServiceMessage> RegisterAsync(UserRegisterDto userRegisterDto)
         {
+            if (userRegisterDto.RoleNames == null || !userRegisterDto.RoleNames.Any())
+            {
+                return new ServiceMessage
+                {
+                    IsSucceed = false,
+                    Message = "At least one role must be selected for the user."
+                };
+            }
+
             await _unitOfWork.BeginTransaction();
             try
             {
@@ -55,25 +64,28 @@ namespace StudentInfoSys.Business.Operations.User
                 await _userRepository.AddAsync(userEntity);
                 await _unitOfWork.SaveChangesAsync();
 
-                var defaultRole = await _roleRepository.GetSingleAsync(r => r.Name == "User" && !r.IsDeleted);
-                if (defaultRole == null)
+                foreach (var roleName in userRegisterDto.RoleNames)
                 {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage
+                    var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
+                    if (role == null)
                     {
-                        IsSucceed = false,
-                        Message = "Default user role not found. Registration failed."
+                        await _unitOfWork.RollbackTransaction();
+                        return new ServiceMessage
+                        {
+                            IsSucceed = false,
+                            Message = $"Role '{roleName}' not found. Registration failed."
+                        };
+                    }
+
+                    var userRole = new UserRoleEntity
+                    {
+                        UserId = userEntity.Id,
+                        RoleId = role.Id
                     };
+                    await _userRoleRepository.AddAsync(userRole);
                 }
 
-                var userRole = new UserRoleEntity
-                {
-                    UserId = userEntity.Id,
-                    RoleId = defaultRole.Id
-                };
-                await _userRoleRepository.AddAsync(userRole);
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransaction();
 
                 return new ServiceMessage
@@ -205,6 +217,16 @@ namespace StudentInfoSys.Business.Operations.User
         // Update an user
         public async Task<ServiceMessage> UpdateByIdAsync(UserUpdateDto userUpdateDto)
         {
+            // RoleNames listesi boşsa hata döndür
+            if (userUpdateDto.RoleNames == null || !userUpdateDto.RoleNames.Any())
+            {
+                return new ServiceMessage
+                {
+                    IsSucceed = false,
+                    Message = "At least one role must be selected for the user."
+                };
+            }
+
             await _unitOfWork.BeginTransaction();
             try
             {
@@ -241,6 +263,39 @@ namespace StudentInfoSys.Business.Operations.User
                 }
 
                 _userRepository.Update(user);
+
+                // Kullanıcının mevcut rollerini sil
+                var existingRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == user.Id && !ur.IsDeleted);
+                foreach (var userRole in existingRoles)
+                {
+                    userRole.IsDeleted = true;
+                    _userRoleRepository.Update(userRole);
+                }
+
+                // Yeni roller ekle
+                foreach (var roleName in userUpdateDto.RoleNames)
+                {
+                    var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
+                    if (role == null)
+                    {
+                        await _unitOfWork.RollbackTransaction();
+                        return new ServiceMessage
+                        {
+                            IsSucceed = false,
+                            Message = $"Role '{roleName}' not found. Update failed."
+                        };
+                    }
+
+                    var newUserRole = new UserRoleEntity
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id,
+                        CreatedDate = DateTime.UtcNow,
+                        IsDeleted = false
+                    };
+                    await _userRoleRepository.AddAsync(newUserRole);
+                }
+
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransaction();
 
@@ -305,95 +360,6 @@ namespace StudentInfoSys.Business.Operations.User
                     IsSucceed = false,
                     Message = $"An error occurred while deleting the user: {ex.Message}"
                 };
-            }
-        }
-
-        // Assign a role
-        public async Task<ServiceMessage> AssignRoleAsync(string email, string roleName)
-        {
-            await _unitOfWork.BeginTransaction();
-            try
-            {
-                var user = await _userRepository.GetSingleAsync(u => u.Email == email && !u.IsDeleted);
-                if (user == null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "User not found." };
-                }
-
-                var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
-                if (role == null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "Role not found." };
-                }
-
-                // Kullanıcıda bu rol zaten var mı kontrol et
-                var hasRole = await _userRoleRepository.GetSingleAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id && !ur.IsDeleted);
-                if (hasRole != null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "User already has this role." };
-                }
-
-                var newUserRole = new UserRoleEntity
-                {
-                    UserId = user.Id,
-                    RoleId = role.Id,
-                    CreatedDate = DateTime.UtcNow,
-                    IsDeleted = false
-                };
-                await _userRoleRepository.AddAsync(newUserRole);
-                await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransaction();
-
-                return new ServiceMessage { IsSucceed = true, Message = "Role assigned to user." };
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransaction();
-                return new ServiceMessage { IsSucceed = false, Message = ex.Message };
-            }
-        }
-
-        // Remove a role
-        public async Task<ServiceMessage> RemoveRoleAsync(string email, string roleName)
-        {
-            await _unitOfWork.BeginTransaction();
-            try
-            {
-                var user = await _userRepository.GetSingleAsync(u => u.Email == email && !u.IsDeleted);
-                if (user == null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "User not found." };
-                }
-
-                var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
-                if (role == null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "Role not found." };
-                }
-
-                var userRole = await _userRoleRepository.GetSingleAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id && !ur.IsDeleted);
-                if (userRole == null)
-                {
-                    await _unitOfWork.RollbackTransaction();
-                    return new ServiceMessage { IsSucceed = false, Message = "User does not have this role." };
-                }
-
-                userRole.IsDeleted = true;
-                _userRoleRepository.Update(userRole);
-                await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransaction();
-
-                return new ServiceMessage { IsSucceed = true, Message = "Role removed from user." };
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransaction();
-                return new ServiceMessage { IsSucceed = false, Message = ex.Message };
             }
         }
     }

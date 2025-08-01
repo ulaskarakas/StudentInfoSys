@@ -37,13 +37,6 @@ namespace StudentInfoSys.Data.Configurations
                 CreatedDate = DateTime.UtcNow,
                 IsDeleted = false
             });
-            builder.HasData(new RoleEntity
-            {
-                Id = 4,
-                Name = "User",
-                CreatedDate = DateTime.UtcNow,
-                IsDeleted = false
-            });
         }
     }
 }
