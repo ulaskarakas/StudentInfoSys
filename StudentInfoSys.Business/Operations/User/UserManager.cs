@@ -496,6 +496,28 @@ namespace StudentInfoSys.Business.Operations.User
                 user.IsDeleted = true;
                 _userRepository.Update(user);
 
+                // User'a bağlı StudentEntity'yi soft-delete et
+                var studentEntity = await _context.Students
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(s => s.UserId == id);
+                if (studentEntity != null && !studentEntity.IsDeleted)
+                {
+                    studentEntity.IsDeleted = true;
+                    studentEntity.ModifiedDate = DateTime.UtcNow;
+                    _studentRepository.Update(studentEntity);
+                }
+
+                // User'a bağlı TeacherEntity'yi soft-delete et
+                var teacherEntity = await _context.Teachers
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(t => t.UserId == id);
+                if (teacherEntity != null && !teacherEntity.IsDeleted)
+                {
+                    teacherEntity.IsDeleted = true;
+                    teacherEntity.ModifiedDate = DateTime.UtcNow;
+                    _teacherRepository.Update(teacherEntity);
+                }
+
                 var userRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == id && !ur.IsDeleted);
                 foreach (var userRole in userRoles)
                 {
