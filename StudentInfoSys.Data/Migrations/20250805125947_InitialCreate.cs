@@ -205,20 +205,20 @@ namespace StudentInfoSys.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "IsDeleted", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9941), false, null, "Admin" },
-                    { 2, new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9950), false, null, "Teacher" },
-                    { 3, new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9954), false, null, "Student" }
+                    { 1, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1941), false, null, "Admin" },
+                    { 2, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1950), false, null, "Teacher" },
+                    { 3, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1953), false, null, "Student" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "BirthDate", "CreatedDate", "Email", "FirstName", "IsDeleted", "LastName", "ModifiedDate", "Password" },
-                values: new object[] { 1, new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(1365), "admin@example.com", "Admin", false, "Admin", null, "CfDJ8GT_2RvrfSxAkbeT_Rm5aL-mawQxIPdC_Em5WmeM8nrqcZYN9EcTl_ceTpFSioYgjUAm43ZZy_LhiP1MflUTahIaKn9Rn-pjb3S9K5VtPdS42a_m19BqLyEiJ-gQNgBf_w" });
+                values: new object[] { 1, new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 5, 12, 59, 47, 232, DateTimeKind.Utc).AddTicks(3272), "admin@example.com", "Admin", false, "Admin", null, "CfDJ8GT_2RvrfSxAkbeT_Rm5aL-mawQxIPdC_Em5WmeM8nrqcZYN9EcTl_ceTpFSioYgjUAm43ZZy_LhiP1MflUTahIaKn9Rn-pjb3S9K5VtPdS42a_m19BqLyEiJ-gQNgBf_w" });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
                 columns: new[] { "RoleId", "UserId", "CreatedDate", "IsDeleted", "ModifiedDate" },
-                values: new object[] { 1, 1, new DateTime(2025, 8, 1, 17, 26, 48, 429, DateTimeKind.Utc).AddTicks(4342), false, null });
+                values: new object[] { 1, 1, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(6407), false, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_TeacherId",

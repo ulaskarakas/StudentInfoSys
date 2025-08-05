@@ -1,6 +1,8 @@
-﻿using StudentInfoSys.Business.Types;
+﻿using Microsoft.EntityFrameworkCore;
 using StudentInfoSys.Business.DataProtection;
 using StudentInfoSys.Business.Operations.User.Dtos;
+using StudentInfoSys.Business.Types;
+using StudentInfoSys.Data.Context;
 using StudentInfoSys.Data.Entities;
 using StudentInfoSys.Data.Repositories;
 using StudentInfoSys.Data.UnitOfWork;
@@ -12,16 +14,22 @@ namespace StudentInfoSys.Business.Operations.User
         private readonly IRepository<UserEntity> _userRepository;
         private readonly IRepository<RoleEntity> _roleRepository;
         private readonly IRepository<UserRoleEntity> _userRoleRepository;
+        private readonly IRepository<StudentEntity> _studentRepository;
+        private readonly IRepository<TeacherEntity> _teacherRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDataProtection _dataProtection;
+        private readonly StudentInfoSysDbContext _context;
 
-        public UserManager(IRepository<UserEntity> userRepository, IRepository<RoleEntity> roleRepository, IRepository<UserRoleEntity> userRoleRepository, IUnitOfWork unitOfWork, IDataProtection dataProtection)
+        public UserManager(IRepository<UserEntity> userRepository, IRepository<RoleEntity> roleRepository, IRepository<UserRoleEntity> userRoleRepository, IRepository<StudentEntity> studentRepository, IRepository<TeacherEntity> teacherRepository, IUnitOfWork unitOfWork, IDataProtection dataProtection, StudentInfoSysDbContext context)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _userRoleRepository = userRoleRepository;
+            _studentRepository = studentRepository;
+            _teacherRepository = teacherRepository;
             _unitOfWork = unitOfWork;
             _dataProtection = dataProtection;
+            _context = context;
         }
 
         // Register
@@ -77,12 +85,84 @@ namespace StudentInfoSys.Business.Operations.User
                         };
                     }
 
-                    var userRole = new UserRoleEntity
+                    // Soft delete kontrolü
+                    var existingUserRole = await _userRoleRepository.GetSingleAsync(
+                        ur => ur.UserId == userEntity.Id && ur.RoleId == role.Id);
+
+                    if (existingUserRole != null)
                     {
-                        UserId = userEntity.Id,
-                        RoleId = role.Id
-                    };
-                    await _userRoleRepository.AddAsync(userRole);
+                        if (existingUserRole.IsDeleted)
+                        {
+                            existingUserRole.IsDeleted = false;
+                            existingUserRole.ModifiedDate = DateTime.UtcNow;
+                            _userRoleRepository.Update(existingUserRole);
+                        }
+                    }
+                    else
+                    {
+                        var userRole = new UserRoleEntity
+                        {
+                            UserId = userEntity.Id,
+                            RoleId = role.Id,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        await _userRoleRepository.AddAsync(userRole);
+                    }
+                }
+
+                // Öğrenci veya öğretmen tablosuna ekleme
+                if (userRegisterDto.RoleNames.Contains("Student"))
+                {
+                    var existingStudent = await _studentRepository.GetSingleAsync(s => s.UserId == userEntity.Id);
+                    if (existingStudent != null)
+                    {
+                        if (existingStudent.IsDeleted)
+                        {
+                            existingStudent.IsDeleted = false;
+                            existingStudent.ModifiedDate = DateTime.UtcNow;
+                            _studentRepository.Update(existingStudent);
+                        }
+                    }
+                    else
+                    {
+                        var studentEntity = new StudentEntity
+                        {
+                            UserId = userEntity.Id,
+                            StudentNumber = string.Empty,
+                            Class = string.Empty,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false,
+                            User = userEntity
+                        };
+                        await _studentRepository.AddAsync(studentEntity);
+                    }
+                }
+
+                if (userRegisterDto.RoleNames.Contains("Teacher"))
+                {
+                    var existingTeacher = await _teacherRepository.GetSingleAsync(t => t.UserId == userEntity.Id);
+                    if (existingTeacher != null)
+                    {
+                        if (existingTeacher.IsDeleted)
+                        {
+                            existingTeacher.IsDeleted = false;
+                            existingTeacher.ModifiedDate = DateTime.UtcNow;
+                            _teacherRepository.Update(existingTeacher);
+                        }
+                    }
+                    else
+                    {
+                        var teacherEntity = new TeacherEntity
+                        {
+                            UserId = userEntity.Id,
+                            Department = string.Empty,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false,
+                            User = userEntity
+                        };
+                        await _teacherRepository.AddAsync(teacherEntity);
+                    }
                 }
 
                 await _unitOfWork.SaveChangesAsync();
@@ -269,6 +349,7 @@ namespace StudentInfoSys.Business.Operations.User
                 foreach (var userRole in existingRoles)
                 {
                     userRole.IsDeleted = true;
+                    userRole.ModifiedDate = DateTime.UtcNow;
                     _userRoleRepository.Update(userRole);
                 }
 
@@ -286,14 +367,93 @@ namespace StudentInfoSys.Business.Operations.User
                         };
                     }
 
-                    var newUserRole = new UserRoleEntity
+                    var existingUserRole = await _userRoleRepository.GetSingleAsync(
+                        ur => ur.UserId == user.Id && ur.RoleId == role.Id);
+
+                    if (existingUserRole != null)
+                    {
+                        if (existingUserRole.IsDeleted)
+                        {
+                            existingUserRole.IsDeleted = false;
+                            existingUserRole.ModifiedDate = DateTime.UtcNow;
+                            _userRoleRepository.Update(existingUserRole);
+                        }
+                    }
+                    else
+                    {
+                        var newUserRole = new UserRoleEntity
+                        {
+                            UserId = user.Id,
+                            RoleId = role.Id,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        await _userRoleRepository.AddAsync(newUserRole);
+                    }
+                }
+
+                // --- Student/Teacher tablosu güncelleme ---
+                var isStudentRole = userUpdateDto.RoleNames.Contains("Student");
+                var studentEntity = await _context.Students.IgnoreQueryFilters()
+                                                           .FirstOrDefaultAsync(s => s.UserId == user.Id);
+                if (studentEntity != null)
+                {
+                    if (!isStudentRole && !studentEntity.IsDeleted)
+                    {
+                        studentEntity.IsDeleted = true;
+                        studentEntity.ModifiedDate = DateTime.UtcNow;
+                        _studentRepository.Update(studentEntity);
+                    }
+                    else if (isStudentRole && studentEntity.IsDeleted)
+                    {
+                        studentEntity.IsDeleted = false;
+                        studentEntity.ModifiedDate = DateTime.UtcNow;
+                        _studentRepository.Update(studentEntity);
+                    }
+                }
+                else if (isStudentRole)
+                {
+                    var newStudent = new StudentEntity
                     {
                         UserId = user.Id,
-                        RoleId = role.Id,
+                        StudentNumber = string.Empty,
+                        Class = string.Empty,
                         CreatedDate = DateTime.UtcNow,
-                        IsDeleted = false
+                        IsDeleted = false,
+                        User = user
                     };
-                    await _userRoleRepository.AddAsync(newUserRole);
+                    await _studentRepository.AddAsync(newStudent);
+                }
+
+                var isTeacherRole = userUpdateDto.RoleNames.Contains("Teacher");
+                var teacherEntity = await _context.Teachers.IgnoreQueryFilters()
+                                                           .FirstOrDefaultAsync(t => t.UserId == user.Id);
+                if (teacherEntity != null)
+                {
+                    if (!isTeacherRole && !teacherEntity.IsDeleted)
+                    {
+                        teacherEntity.IsDeleted = true;
+                        teacherEntity.ModifiedDate = DateTime.UtcNow;
+                        _teacherRepository.Update(teacherEntity);
+                    }
+                    else if (isTeacherRole && teacherEntity.IsDeleted)
+                    {
+                        teacherEntity.IsDeleted = false;
+                        teacherEntity.ModifiedDate = DateTime.UtcNow;
+                        _teacherRepository.Update(teacherEntity);
+                    }
+                }
+                else if (isTeacherRole)
+                {
+                    var newTeacher = new TeacherEntity
+                    {
+                        UserId = user.Id,
+                        Department = string.Empty,
+                        CreatedDate = DateTime.UtcNow,
+                        IsDeleted = false,
+                        User = user
+                    };
+                    await _teacherRepository.AddAsync(newTeacher);
                 }
 
                 await _unitOfWork.SaveChangesAsync();

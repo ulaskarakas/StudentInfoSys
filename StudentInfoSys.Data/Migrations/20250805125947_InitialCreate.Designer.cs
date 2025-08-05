@@ -12,7 +12,7 @@ using StudentInfoSys.Data.Context;
 namespace StudentInfoSys.Data.Migrations
 {
     [DbContext(typeof(StudentInfoSysDbContext))]
-    [Migration("20250801172648_InitialCreate")]
+    [Migration("20250805125947_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -163,21 +163,21 @@ namespace StudentInfoSys.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9941),
+                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1941),
                             IsDeleted = false,
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9950),
+                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1950),
                             IsDeleted = false,
                             Name = "Teacher"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(9954),
+                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1953),
                             IsDeleted = false,
                             Name = "Student"
                         });
@@ -296,7 +296,7 @@ namespace StudentInfoSys.Data.Migrations
                         {
                             Id = 1,
                             BirthDate = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 8, 1, 17, 26, 48, 428, DateTimeKind.Utc).AddTicks(1365),
+                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 232, DateTimeKind.Utc).AddTicks(3272),
                             Email = "admin@example.com",
                             FirstName = "Admin",
                             IsDeleted = false,
@@ -333,7 +333,7 @@ namespace StudentInfoSys.Data.Migrations
                         {
                             UserId = 1,
                             RoleId = 1,
-                            CreatedDate = new DateTime(2025, 8, 1, 17, 26, 48, 429, DateTimeKind.Utc).AddTicks(4342),
+                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(6407),
                             IsDeleted = false
                         });
                 });
