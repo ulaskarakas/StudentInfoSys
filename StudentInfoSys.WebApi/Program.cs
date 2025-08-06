@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StudentInfoSys.Business.DataProtection;
+using StudentInfoSys.Business.Operations.Course;
 using StudentInfoSys.Business.Operations.Student;
 using StudentInfoSys.Business.Operations.Teacher;
 using StudentInfoSys.Business.Operations.User;
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<IStudentService, StudentManager>();
 builder.Services.AddScoped<ITeacherService, TeacherManager>();
+builder.Services.AddScoped<ICourseService, CourseManager>();
 
 // Data Protection
 builder.Services.AddScoped<IDataProtection, DataProtection>();

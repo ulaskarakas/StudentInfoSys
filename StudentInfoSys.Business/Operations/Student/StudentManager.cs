@@ -17,6 +17,7 @@ namespace StudentInfoSys.Business.Operations.Student
             _unitOfWork = unitOfWork;
         }
 
+        // Read
         public async Task<ServiceMessage<StudentInfoDto>> GetByIdAsync(int id)
         {
             try
@@ -54,6 +55,7 @@ namespace StudentInfoSys.Business.Operations.Student
             }
         }
 
+        // Update
         public async Task<ServiceMessage> UpdateByIdAsync(StudentUpdateDto studentUpdateDto)
         {
             await _unitOfWork.BeginTransaction();

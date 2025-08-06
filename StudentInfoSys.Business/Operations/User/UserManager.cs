@@ -35,15 +35,6 @@ namespace StudentInfoSys.Business.Operations.User
         // Register
         public async Task<ServiceMessage> RegisterAsync(UserRegisterDto userRegisterDto)
         {
-            if (userRegisterDto.RoleNames == null || !userRegisterDto.RoleNames.Any())
-            {
-                return new ServiceMessage
-                {
-                    IsSucceed = false,
-                    Message = "At least one role must be selected for the user."
-                };
-            }
-
             await _unitOfWork.BeginTransaction();
             try
             {
@@ -58,7 +49,17 @@ namespace StudentInfoSys.Business.Operations.User
                     };
                 }
 
-                var userEntity = new UserEntity
+                if (userRegisterDto.RoleNames == null || !userRegisterDto.RoleNames.Any())
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage
+                    {
+                        IsSucceed = false,
+                        Message = "At least one role must be selected for the user."
+                    };
+                }
+
+                var user = new UserEntity
                 {
                     FirstName = userRegisterDto.FirstName,
                     LastName = userRegisterDto.LastName,
@@ -69,7 +70,7 @@ namespace StudentInfoSys.Business.Operations.User
                     IsDeleted = false
                 };
 
-                await _userRepository.AddAsync(userEntity);
+                await _userRepository.AddAsync(user);
                 await _unitOfWork.SaveChangesAsync();
 
                 foreach (var roleName in userRegisterDto.RoleNames)
@@ -85,9 +86,8 @@ namespace StudentInfoSys.Business.Operations.User
                         };
                     }
 
-                    // Soft delete kontrolü
                     var existingUserRole = await _userRoleRepository.GetSingleAsync(
-                        ur => ur.UserId == userEntity.Id && ur.RoleId == role.Id);
+                        ur => ur.UserId == user.Id && ur.RoleId == role.Id);
 
                     if (existingUserRole != null)
                     {
@@ -102,7 +102,7 @@ namespace StudentInfoSys.Business.Operations.User
                     {
                         var userRole = new UserRoleEntity
                         {
-                            UserId = userEntity.Id,
+                            UserId = user.Id,
                             RoleId = role.Id,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false
@@ -111,10 +111,10 @@ namespace StudentInfoSys.Business.Operations.User
                     }
                 }
 
-                // Öğrenci veya öğretmen tablosuna ekleme
+                // Add to student or teacher tables
                 if (userRegisterDto.RoleNames.Contains("Student"))
                 {
-                    var existingStudent = await _studentRepository.GetSingleAsync(s => s.UserId == userEntity.Id);
+                    var existingStudent = await _studentRepository.GetSingleAsync(s => s.UserId == user.Id);
                     if (existingStudent != null)
                     {
                         if (existingStudent.IsDeleted)
@@ -128,12 +128,12 @@ namespace StudentInfoSys.Business.Operations.User
                     {
                         var studentEntity = new StudentEntity
                         {
-                            UserId = userEntity.Id,
+                            UserId = user.Id,
                             StudentNumber = string.Empty,
                             Class = string.Empty,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false,
-                            User = userEntity
+                            User = user
                         };
                         await _studentRepository.AddAsync(studentEntity);
                     }
@@ -141,7 +141,7 @@ namespace StudentInfoSys.Business.Operations.User
 
                 if (userRegisterDto.RoleNames.Contains("Teacher"))
                 {
-                    var existingTeacher = await _teacherRepository.GetSingleAsync(t => t.UserId == userEntity.Id);
+                    var existingTeacher = await _teacherRepository.GetSingleAsync(t => t.UserId == user.Id);
                     if (existingTeacher != null)
                     {
                         if (existingTeacher.IsDeleted)
@@ -155,11 +155,11 @@ namespace StudentInfoSys.Business.Operations.User
                     {
                         var teacherEntity = new TeacherEntity
                         {
-                            UserId = userEntity.Id,
+                            UserId = user.Id,
                             Department = string.Empty,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false,
-                            User = userEntity
+                            User = user
                         };
                         await _teacherRepository.AddAsync(teacherEntity);
                     }
@@ -244,7 +244,7 @@ namespace StudentInfoSys.Business.Operations.User
             }
         }
 
-        // Get an user
+        // Read
         public async Task<ServiceMessage<UserInfoDto>> GetByIdAsync(int id)
         {
             try
@@ -294,19 +294,9 @@ namespace StudentInfoSys.Business.Operations.User
             }
         }
 
-        // Update an user
+        // Update
         public async Task<ServiceMessage> UpdateByIdAsync(UserUpdateDto userUpdateDto)
         {
-            // RoleNames listesi boşsa hata döndür
-            if (userUpdateDto.RoleNames == null || !userUpdateDto.RoleNames.Any())
-            {
-                return new ServiceMessage
-                {
-                    IsSucceed = false,
-                    Message = "At least one role must be selected for the user."
-                };
-            }
-
             await _unitOfWork.BeginTransaction();
             try
             {
@@ -332,6 +322,17 @@ namespace StudentInfoSys.Business.Operations.User
                     };
                 }
 
+                // Check if the Roles list is empty
+                if (userUpdateDto.RoleNames == null || !userUpdateDto.RoleNames.Any())
+                {
+                    await _unitOfWork.RollbackTransaction();
+                    return new ServiceMessage
+                    {
+                        IsSucceed = false,
+                        Message = "At least one role must be selected for the user."
+                    };
+                }
+
                 user.FirstName = userUpdateDto.FirstName;
                 user.LastName = userUpdateDto.LastName;
                 user.Email = userUpdateDto.Email;
@@ -344,7 +345,7 @@ namespace StudentInfoSys.Business.Operations.User
 
                 _userRepository.Update(user);
 
-                // Kullanıcının mevcut rollerini sil
+                // Delete the user's existing roles
                 var existingRoles = await _userRoleRepository.GetWhereAsync(ur => ur.UserId == user.Id && !ur.IsDeleted);
                 foreach (var userRole in existingRoles)
                 {
@@ -353,7 +354,7 @@ namespace StudentInfoSys.Business.Operations.User
                     _userRoleRepository.Update(userRole);
                 }
 
-                // Yeni roller ekle
+                // Add new roles
                 foreach (var roleName in userUpdateDto.RoleNames)
                 {
                     var role = await _roleRepository.GetSingleAsync(r => r.Name == roleName && !r.IsDeleted);
@@ -392,7 +393,7 @@ namespace StudentInfoSys.Business.Operations.User
                     }
                 }
 
-                // --- Student/Teacher tablosu güncelleme ---
+                // Update student and teacher tables 
                 var isStudentRole = userUpdateDto.RoleNames.Contains("Student");
                 var studentEntity = await _context.Students.IgnoreQueryFilters()
                                                            .FirstOrDefaultAsync(s => s.UserId == user.Id);
@@ -476,7 +477,7 @@ namespace StudentInfoSys.Business.Operations.User
             }
         }
 
-        // Delete an user
+        // Delete
         public async Task<ServiceMessage> DeleteByIdAsync(int id)
         {
             await _unitOfWork.BeginTransaction();
@@ -496,7 +497,7 @@ namespace StudentInfoSys.Business.Operations.User
                 user.IsDeleted = true;
                 _userRepository.Update(user);
 
-                // User'a bağlı StudentEntity'yi soft-delete et
+                // Soft-delete the student attached to the user
                 var studentEntity = await _context.Students
                     .IgnoreQueryFilters()
                     .FirstOrDefaultAsync(s => s.UserId == id);
@@ -507,7 +508,7 @@ namespace StudentInfoSys.Business.Operations.User
                     _studentRepository.Update(studentEntity);
                 }
 
-                // User'a bağlı TeacherEntity'yi soft-delete et
+                // Soft-delete the teacher attached to the user
                 var teacherEntity = await _context.Teachers
                     .IgnoreQueryFilters()
                     .FirstOrDefaultAsync(t => t.UserId == id);

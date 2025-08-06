@@ -17,6 +17,7 @@ namespace StudentInfoSys.Business.Operations.Teacher
             _unitOfWork = unitOfWork;
         }
 
+        // Read
         public async Task<ServiceMessage<TeacherInfoDto>> GetByIdAsync(int id)
         {
             try
@@ -51,10 +52,9 @@ namespace StudentInfoSys.Business.Operations.Teacher
                     Message = $"An error occurred while retrieving the teacher: {ex.Message}"
                 };
             }
-
-            throw new NotImplementedException();
         }
 
+        // Update
         public async Task<ServiceMessage> UpdateByIdAsync(TeacherUpdateDto teacherUpdateDto)
         {
             await _unitOfWork.BeginTransaction();
