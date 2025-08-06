@@ -97,6 +97,7 @@ namespace StudentInfoSys.Business.Operations.Student
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransaction();
                 return new ServiceMessage
                 {
                     IsSucceed = false,
