@@ -8,6 +8,7 @@ namespace StudentInfoSys.Business.Operations.Course.Dtos
         public required string CourseCode { get; set; }
         [Required]
         public required string Title { get; set; }
-        public int TeacherId { get; set; }
+        [Required]
+        public required int TeacherId { get; set; }
     }
 }

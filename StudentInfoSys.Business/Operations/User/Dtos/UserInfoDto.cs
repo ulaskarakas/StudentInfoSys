@@ -14,6 +14,7 @@ namespace StudentInfoSys.Business.Operations.User.Dtos
         public required string LastName { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
+        [Required]
         public required List<string> Roles { get; set; }
     }
 }
