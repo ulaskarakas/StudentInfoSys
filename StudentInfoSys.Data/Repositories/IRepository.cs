@@ -16,6 +16,9 @@ namespace StudentInfoSys.Data.Repositories
         // Retrieves a single entity that matches a given filter expression
         Task<TEntity?> GetSingleAsync(Expression<Func<TEntity, bool>> predicate);
 
+        // Returns the number of entities that match the given filter expression
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+
         // Adds a new entity to the database asynchronously
         Task AddAsync(TEntity entity);
 

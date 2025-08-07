@@ -21,9 +21,15 @@ namespace StudentInfoSys.WebApi.Controllers
         // Create
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> CreateCourse(CourseCreateDto dto)
+        public async Task<IActionResult> CreateCourse(CourseCreateRequest request)
         {
-            var result = await _courseService.CreateAsync(dto);
+            var createCourseDto = new CourseCreateDto
+            {
+                CourseCode = request.CourseCode,
+                Title = request.Title,
+                TeacherId = request.TeacherId
+            };
+            var result = await _courseService.CreateAsync(createCourseDto);
             if (!result.IsSucceed) 
                 return BadRequest(result.Message);
             return Ok(result.Message);

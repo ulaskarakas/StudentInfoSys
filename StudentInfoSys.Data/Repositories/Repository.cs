@@ -47,6 +47,12 @@ namespace StudentInfoSys.Data.Repositories
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
+        // Returns the number of entities that match the given filter expression
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.CountAsync(predicate);
+        }
+
         // Updates an existing entity in the database
         public void Update(TEntity entity)
         {

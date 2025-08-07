@@ -8,7 +8,7 @@ namespace StudentInfoSys.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EnrollmentController : Controller
+    public class EnrollmentController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;
 
@@ -19,16 +19,22 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> CreateEnrollment(EnrollmentCreateDto dto)
+        public async Task<IActionResult> CreateEnrollment(EnrollmentCreateRequest request)
         {
-            var result = await _enrollmentService.CreateAsync(dto);
+            var createEnrollmentDto = new EnrollmentCreateDto
+            {
+                CourseId = request.CourseId,
+                StudentId = request.StudentId,
+                AbsanceCount = request.AbsanceCount
+            };
+            var result = await _enrollmentService.CreateAsync(createEnrollmentDto);
             if (!result.IsSucceed) 
                 return BadRequest(result.Message);
             return Ok(result.Message);
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Admin,Teacher")]
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> GetEnrollmentById(int id)
         {
             var result = await _enrollmentService.GetByIdAsync(id);
