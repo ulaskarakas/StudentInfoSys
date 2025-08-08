@@ -23,6 +23,7 @@ namespace StudentInfoSys.Data.Context
             modelBuilder.ApplyConfiguration(new ExamConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new SettingConfiguration());
         }
 
         public DbSet<UserEntity> Users { get; set; }
@@ -33,5 +34,6 @@ namespace StudentInfoSys.Data.Context
         public DbSet<CourseEntity> Courses { get; set; }
         public DbSet<EnrollmentEntity> Enrollments { get; set; }
         public DbSet<ExamEntity> Exams { get; set; }
+        public DbSet<SettingEntity> Settings => Set<SettingEntity>();
     }
 }

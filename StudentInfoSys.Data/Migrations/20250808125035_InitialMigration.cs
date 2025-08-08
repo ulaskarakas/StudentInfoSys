@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StudentInfoSys.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,22 @@ namespace StudentInfoSys.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Settings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaintenanceMode = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Settings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,20 +221,25 @@ namespace StudentInfoSys.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "IsDeleted", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1941), false, null, "Admin" },
-                    { 2, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1950), false, null, "Teacher" },
-                    { 3, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1953), false, null, "Student" }
+                    { 1, new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6185), false, null, "Admin" },
+                    { 2, new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6194), false, null, "Teacher" },
+                    { 3, new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6221), false, null, "Student" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Settings",
+                columns: new[] { "Id", "CreatedDate", "IsDeleted", "MaintenanceMode", "ModifiedDate" },
+                values: new object[] { 1, new DateTime(2025, 8, 8, 12, 50, 35, 491, DateTimeKind.Utc).AddTicks(932), false, false, null });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "BirthDate", "CreatedDate", "Email", "FirstName", "IsDeleted", "LastName", "ModifiedDate", "Password" },
-                values: new object[] { 1, new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 5, 12, 59, 47, 232, DateTimeKind.Utc).AddTicks(3272), "admin@example.com", "Admin", false, "Admin", null, "CfDJ8GT_2RvrfSxAkbeT_Rm5aL-mawQxIPdC_Em5WmeM8nrqcZYN9EcTl_ceTpFSioYgjUAm43ZZy_LhiP1MflUTahIaKn9Rn-pjb3S9K5VtPdS42a_m19BqLyEiJ-gQNgBf_w" });
+                values: new object[] { 1, new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 8, 12, 50, 35, 489, DateTimeKind.Utc).AddTicks(7843), "admin@example.com", "Admin", false, "Admin", null, "CfDJ8GT_2RvrfSxAkbeT_Rm5aL-mawQxIPdC_Em5WmeM8nrqcZYN9EcTl_ceTpFSioYgjUAm43ZZy_LhiP1MflUTahIaKn9Rn-pjb3S9K5VtPdS42a_m19BqLyEiJ-gQNgBf_w" });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
                 columns: new[] { "RoleId", "UserId", "CreatedDate", "IsDeleted", "ModifiedDate" },
-                values: new object[] { 1, 1, new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(6407), false, null });
+                values: new object[] { 1, 1, new DateTime(2025, 8, 8, 12, 50, 35, 491, DateTimeKind.Utc).AddTicks(503), false, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_TeacherId",
@@ -263,6 +284,9 @@ namespace StudentInfoSys.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Exams");
+
+            migrationBuilder.DropTable(
+                name: "Settings");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");

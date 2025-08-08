@@ -160,23 +160,57 @@ namespace StudentInfoSys.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1941),
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6185),
                             IsDeleted = false,
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1950),
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6194),
                             IsDeleted = false,
                             Name = "Teacher"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(1953),
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 490, DateTimeKind.Utc).AddTicks(6221),
                             IsDeleted = false,
                             Name = "Student"
+                        });
+                });
+
+            modelBuilder.Entity("StudentInfoSys.Data.Entities.SettingEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MaintenanceMode")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 491, DateTimeKind.Utc).AddTicks(932),
+                            IsDeleted = false,
+                            MaintenanceMode = false
                         });
                 });
 
@@ -293,7 +327,7 @@ namespace StudentInfoSys.Data.Migrations
                         {
                             Id = 1,
                             BirthDate = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 232, DateTimeKind.Utc).AddTicks(3272),
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 489, DateTimeKind.Utc).AddTicks(7843),
                             Email = "admin@example.com",
                             FirstName = "Admin",
                             IsDeleted = false,
@@ -330,7 +364,7 @@ namespace StudentInfoSys.Data.Migrations
                         {
                             UserId = 1,
                             RoleId = 1,
-                            CreatedDate = new DateTime(2025, 8, 5, 12, 59, 47, 233, DateTimeKind.Utc).AddTicks(6407),
+                            CreatedDate = new DateTime(2025, 8, 8, 12, 50, 35, 491, DateTimeKind.Utc).AddTicks(503),
                             IsDeleted = false
                         });
                 });

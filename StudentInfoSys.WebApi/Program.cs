@@ -7,12 +7,14 @@ using StudentInfoSys.Business.DataProtection;
 using StudentInfoSys.Business.Operations.Course;
 using StudentInfoSys.Business.Operations.Enrollment;
 using StudentInfoSys.Business.Operations.Exam;
+using StudentInfoSys.Business.Operations.Setting;
 using StudentInfoSys.Business.Operations.Student;
 using StudentInfoSys.Business.Operations.Teacher;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Data.Context;
 using StudentInfoSys.Data.Repositories;
 using StudentInfoSys.Data.UnitOfWork;
+using StudentInfoSys.WebApi.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,6 +63,7 @@ builder.Services.AddScoped<ITeacherService, TeacherManager>();
 builder.Services.AddScoped<ICourseService, CourseManager>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentManager>();
 builder.Services.AddScoped<IExamService, ExamManager>();
+builder.Services.AddScoped<ISettingService, SettingManager>();
 
 // Data Protection
 builder.Services.AddScoped<IDataProtection, DataProtection>();
@@ -95,6 +98,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMaintenanceMode();
 
 app.UseHttpsRedirection();
 
