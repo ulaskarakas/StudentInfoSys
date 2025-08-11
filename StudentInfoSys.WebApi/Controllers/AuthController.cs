@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.User;
 using StudentInfoSys.Business.Operations.User.Dtos;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Jwt;
 using StudentInfoSys.WebApi.Models.User;
 
@@ -19,6 +20,7 @@ namespace StudentInfoSys.WebApi.Controllers
         }
 
         [HttpPost("register")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> Register(UserRegisterRequest request)
         {
             if (!ModelState.IsValid)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.User;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Models.User;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -29,6 +30,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateRequest request)
         {
             var updateUserDto = new UserUpdateDto
@@ -54,6 +56,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result = await _userService.DeleteByIdAsync(id);

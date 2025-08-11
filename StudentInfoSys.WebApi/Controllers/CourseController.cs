@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.Course;
 using StudentInfoSys.Business.Operations.Course.Dtos;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Models.Course;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -21,6 +22,7 @@ namespace StudentInfoSys.WebApi.Controllers
         // Create
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> CreateCourse(CourseCreateRequest request)
         {
             var createCourseDto = new CourseCreateDto
@@ -49,6 +51,7 @@ namespace StudentInfoSys.WebApi.Controllers
         // Update
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> UpdateCourse(int id, CourseUpdateRequest request)
         {
             var updateCourseDto = new CourseUpdateDto
@@ -71,6 +74,7 @@ namespace StudentInfoSys.WebApi.Controllers
         // Delete
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
             var result = await _courseService.DeleteByIdAsync(id);

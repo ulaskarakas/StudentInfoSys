@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.Teacher;
 using StudentInfoSys.Business.Operations.Teacher.Dtos;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Models.Teacher;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -30,6 +31,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> UpdateTeacher(int id, TeacherUpdateRequest request)
         {
             var updateTeacherDto = new TeacherUpdateDto

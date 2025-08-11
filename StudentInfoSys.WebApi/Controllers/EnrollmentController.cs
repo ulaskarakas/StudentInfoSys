@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.Enrollment;
 using StudentInfoSys.Business.Operations.Enrollment.Dtos;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Models.Enrollment;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -19,6 +20,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> CreateEnrollment(EnrollmentCreateRequest request)
         {
             var createEnrollmentDto = new EnrollmentCreateDto
@@ -45,6 +47,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> UpdateEnrollment(int id, EnrollmentUpdateRequest request)
         {
             var updateEnrollmentDto = new EnrollmentUpdateDto
@@ -60,6 +63,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> DeleteEnrollment(int id)
         {
             var result = await _enrollmentService.DeleteByIdAsync(id);

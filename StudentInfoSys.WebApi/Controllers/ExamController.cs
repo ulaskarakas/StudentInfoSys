@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInfoSys.Business.Operations.Exam;
 using StudentInfoSys.Business.Operations.Exam.Dtos;
+using StudentInfoSys.WebApi.Filters;
 using StudentInfoSys.WebApi.Models.Exam;
 
 namespace StudentInfoSys.WebApi.Controllers
@@ -19,6 +20,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> CreateExam(ExamCreateRequest request)
         {
             var updateExamDto = new ExamCreateDto
@@ -46,6 +48,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> UpdateExam(int id, ExamUpdateRequest request)
         {
             var updateExamDto = new ExamUpdateDto
@@ -63,6 +66,7 @@ namespace StudentInfoSys.WebApi.Controllers
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin,Teacher")]
+        [TimeControlFilter("23:59", "07:00")]
         public async Task<IActionResult> DeleteExam(int id)
         {
             var result = await _examService.DeleteByIdAsync(id);
