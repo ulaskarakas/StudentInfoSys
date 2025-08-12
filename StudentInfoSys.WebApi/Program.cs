@@ -100,6 +100,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMaintenanceMode();
+app.UseExceptionHandling();
 
 app.UseHttpsRedirection();
 
